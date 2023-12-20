@@ -39,7 +39,7 @@ class Cheek(commands.AutoShardedBot):
         print(f'{self.user.name}(으)로 로그인됨\n'
               f'Discord.py 버전: {discord.__version__}\n'
               f'소유자: {self.app_info.owner}\n'
-              f'초대 링크: https://discord.com/oauth2/authorize?client_id={self.user.id}&scope=bot+applications.commands&permissions=274877958144')
+              f'초대 링크: https://discord.com/oauth2/authorize?client_id={self.user.id}&scope=bot+applications.commands&permissions=149504')
         print('-' * 32)
 
     async def on_guild_join(self, guild):
