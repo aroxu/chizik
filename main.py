@@ -9,7 +9,7 @@ from discord.ext.commands import CommandNotFound
 import SECRETS
 
 
-class Cheek(commands.AutoShardedBot):
+class Chizik(commands.AutoShardedBot):
     def __init__(self, **kwargs):
         intent = discord.Intents.default()
         super().__init__(command_prefix="", intents=intent, activity=discord.Activity(
@@ -53,7 +53,7 @@ class Cheek(commands.AutoShardedBot):
 
 async def run():
     logging.basicConfig(level=logging.INFO)
-    cheek = Cheek(config=SECRETS)
-    await cheek.start(SECRETS.bot_token)
+    chizik = Chizik(config=SECRETS)
+    await chizik.start(SECRETS.bot_token)
 
 asyncio.run(run())
