@@ -73,6 +73,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                             session.commit()
                             embed = discord.Embed(
                                 title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00ff00)
+                            embed.url = f"https://chzzk.naver.com/{statement.streamer_id}"
                             embed.set_footer(text=statement.streamer_id)
                             embed.timestamp = discord.utils.utcnow()
                             embed.set_image(
@@ -126,6 +127,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
 
         embed = discord.Embed(
             title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00ff00)
+        embed.url = f"https://chzzk.naver.com/{channel_id}"
         embed.set_footer(text=channel_id)
         embed.timestamp = discord.utils.utcnow()
         embed.set_image(

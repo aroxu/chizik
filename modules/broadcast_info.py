@@ -61,6 +61,7 @@ class BroadcastInfo(commands.Cog):
 
         embed = discord.Embed(
             title=streamer_info_data["channelName"], description=streamer_info_data["channelDescription"], color=0x00ff00)
+        embed.url = f"https://chzzk.naver.com/{channel_id}"
         embed.set_footer(text=channel_id)
         embed.set_thumbnail(
             url=streamer_info_data["channelImageUrl"])
