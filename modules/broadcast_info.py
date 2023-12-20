@@ -91,7 +91,7 @@ class BroadcastInfo(commands.Cog):
             embed.add_field(
                 name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}", inline=False)
 
-            await interaction.response.send_message(embed=embed, ephemeral=True, view=StreamDetail())
+            await interaction.response.send_message(embed=embed, ephemeral=True, view=StreamDetail(timeout=15, interaction=interaction, embed=embed))
         else:
             await interaction.response.send_message(embed=embed, ephemeral=True)
 

@@ -84,7 +84,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                             embed.add_field(
                                 name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}")
                             channel = await self.bot.fetch_channel(statement.alert_channel)
-                            await channel.send(content=statement.alert_text, embed=embed)
+                            await channel.send(content=statement.alert_text, embed=embed, allowed_mentions=discord.AllowedMentions(everyone=True))
                             continue
                     else:
                         if statement.is_streaming == False:
@@ -118,6 +118,9 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
         if not stream_info_data or stream_info_data["code"] != 200:
             await interaction.response.send_message("치지직 서버 오류입니다.", ephemeral=True)
             return
+        if stream_info_data["content"] == None:
+            await interaction.response.send_message("해당 채널은 방송 채널이 아닌 것 같습니다. 방송이 가능한 사용자인지 확인해주세요.", ephemeral=True)
+            return
 
         stream_info_data = stream_info_data["content"]
 
@@ -132,8 +135,9 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
             name="시청자 수", value=f"{stream_info_data['concurrentUserCount']}명")
         embed.add_field(
             name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}")
-
-        view = StreamAlertCreateConfirm(timeout=10, interaction=interaction,
+        
+        
+        view = StreamAlertCreateConfirm(timeout=15, interaction=interaction,
                                         channel_id=channel_id, alert_channel=alert_channel, alert_text=alert_text)
 
         await interaction.response.send_message(content=f"방송 시작이 감지되면 아래와 같이 메세지가 발송됩니다.\n\n{alert_text if alert_text else ''}", embed=embed, ephemeral=True, view=view, delete_after=15)

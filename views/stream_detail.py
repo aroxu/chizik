@@ -6,7 +6,9 @@ BASE_URL = "https://api.chzzk.naver.com/service/v1/channels/"
 
 
 class StreamDetail(discord.ui.View):
-    def __init__(self, *, timeout=15):
+    def __init__(self, timeout=15, **kwargs):
+        self.interaction = kwargs["interaction"]
+        self.embed = kwargs["embed"]
         super().__init__(timeout=timeout)
 
     @discord.ui.button(label="방송 세부정보 확인", style=discord.ButtonStyle.gray)
@@ -59,3 +61,7 @@ class StreamDetail(discord.ui.View):
                 await interaction.response.edit_message(embed=embed, view=None)
                 self.value = True
                 self.stop()
+
+    async def on_timeout(self) -> None:
+        await self.interaction.followup.send(embed=self.embed, ephemeral=True)
+        return await super().on_timeout()
