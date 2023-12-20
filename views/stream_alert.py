@@ -22,7 +22,7 @@ class StreamAlertCreateConfirm(discord.ui.View):
                 guild_id=interaction.guild.id).first()
             if statements == None:
                 statements = Guild(
-                    guild_id=interaction.guild.id, streamer_id=self.channel_id, alert_channel=self.alert_channel.id, alert_text=self.alert_text, activated=True)
+                    guild_id=interaction.guild.id, streamer_id=self.channel_id, alert_channel=self.alert_channel.id, alert_text=self.alert_text, is_streaming=True, activated=True)
                 session.add(statements)
                 session.commit()
             else:

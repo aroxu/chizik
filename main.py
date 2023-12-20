@@ -12,7 +12,8 @@ import SECRETS
 class Cheek(commands.AutoShardedBot):
     def __init__(self, **kwargs):
         intent = discord.Intents.default()
-        super().__init__(command_prefix="", intents=intent)
+        super().__init__(command_prefix="", intents=intent, activity=discord.Activity(
+            type=discord.ActivityType.listening, name="치지직.. 신호"))
         self.remove_command("help")
 
     async def setup_hook(self):

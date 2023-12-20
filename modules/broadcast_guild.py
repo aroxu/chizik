@@ -135,8 +135,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
             name="시청자 수", value=f"{stream_info_data['concurrentUserCount']}명")
         embed.add_field(
             name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}")
-        
-        
+
         view = StreamAlertCreateConfirm(timeout=15, interaction=interaction,
                                         channel_id=channel_id, alert_channel=alert_channel, alert_text=alert_text)
 
@@ -209,7 +208,6 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
 
     @_set_stream_alert.error
     async def _set_stream_alert_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
-        print(error)
         if isinstance(error, app_commands.MissingPermissions):
             await interaction.response.send_message(content="이 명령어를 실행할 권한이 없는 것 같습니다.", ephemeral=True)
 
