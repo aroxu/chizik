@@ -195,7 +195,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
 
                 embed = discord.Embed(
                     title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00ff00)
-                embed.url = f"https://chzzk.naver.com/{channel_id}"
+                embed.url = f"https://chzzk.naver.com/{statements.streamer_id}"
                 embed.set_footer(text=statements.streamer_id)
                 embed.timestamp = discord.utils.utcnow()
                 embed.set_image(
