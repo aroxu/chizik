@@ -45,6 +45,7 @@ class BroadcastInfo(commands.Cog):
             print(f"Unexpected error fetching stream info: {e}")
             return None
 
+    @app_commands.guild_only()
     @app_commands.command(name="방송정보", description="스트리머의 방송 상태를 확인합니다.")
     @app_commands.describe(channel_id="스트리머의 채널 ID")
     async def _stream_info(self, interaction: discord.Interaction, channel_id: str) -> None:
