@@ -63,5 +63,5 @@ class StreamDetail(discord.ui.View):
                 self.stop()
 
     async def on_timeout(self) -> None:
-        await self.interaction.followup.send(embed=self.embed, ephemeral=True)
+        await self.interaction.followup.send(embed=self.embed)
         return await super().on_timeout()

@@ -52,12 +52,12 @@ class BroadcastInfo(commands.Cog):
         streamer_info_data = await self.fetch_streamer_info(channel_id)
 
         if not streamer_info_data or streamer_info_data["code"] != 200:
-            await interaction.response.send_message("채널을 찾을 수 없습니다.", ephemeral=True)
+            await interaction.response.send_message("채널을 찾을 수 없습니다.")
             return
 
         streamer_info_data = streamer_info_data["content"]
         if streamer_info_data["channelId"] is None:
-            await interaction.response.send_message("채널을 찾을 수 없습니다.", ephemeral=True)
+            await interaction.response.send_message("채널을 찾을 수 없습니다.")
             return
 
         embed = discord.Embed(
@@ -75,7 +75,7 @@ class BroadcastInfo(commands.Cog):
             if not stream_info_data or stream_info_data["code"] != 200:
                 embed.add_field(
                     name="방송 세부정보", value="방송 세부정보를 불러올 수 없습니다.", inline=False)
-                await interaction.response.send_message(embed=embed, ephemeral=True)
+                await interaction.response.send_message(embed=embed)
                 return
 
             stream_info_data = stream_info_data["content"]
@@ -93,9 +93,9 @@ class BroadcastInfo(commands.Cog):
             embed.add_field(
                 name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}", inline=False)
 
-            await interaction.response.send_message(embed=embed, ephemeral=True, view=StreamDetail(timeout=15, interaction=interaction, embed=embed))
+            await interaction.response.send_message(embed=embed, view=StreamDetail(timeout=15, interaction=interaction, embed=embed))
         else:
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+            await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:

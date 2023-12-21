@@ -41,7 +41,7 @@ class StreamAlertCreateConfirm(discord.ui.View):
         await interaction.response.edit_message(content="취소되었습니다.", view=None, embed=None, delete_after=5)
 
     async def on_timeout(self) -> None:
-        timeout_message = await self.interaction.followup.send(content="시간이 초과되었습니다.", ephemeral=True)
+        timeout_message = await self.interaction.followup.send(content="시간이 초과되었습니다.")
         await sleep(5)
         await timeout_message.delete()
         return await super().on_timeout()
