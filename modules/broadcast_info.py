@@ -67,14 +67,14 @@ class BroadcastInfo(commands.Cog):
         embed.set_thumbnail(
             url=streamer_info_data["channelImageUrl"])
         embed.add_field(
-            name="방송 여부", value=f"{'방송중' if streamer_info_data['openLive'] else '방송중이 아님'}")
+            name="방송 여부", value=f"{'방송중' if streamer_info_data['openLive'] else '방송중이 아님'}", inline=False)
 
         if streamer_info_data['openLive']:
             stream_info_data = await self.fetch_stream_info(channel_id)
 
             if not stream_info_data or stream_info_data["code"] != 200:
                 embed.add_field(
-                    name="방송 세부정보", value="방송 세부정보를 불러올 수 없습니다.")
+                    name="방송 세부정보", value="방송 세부정보를 불러올 수 없습니다.", inline=False)
                 await interaction.response.send_message(embed=embed, ephemeral=True)
                 return
 
