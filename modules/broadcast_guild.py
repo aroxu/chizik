@@ -7,6 +7,7 @@ from discord.ext import tasks
 from db.index import DB
 from models.guild import Guild
 from views.stream_alert import StreamAlertCreateConfirm
+from views.stream_alert_info import StreamAlertInfo
 
 BASE_URL = "https://api.chzzk.naver.com/service/v1/channels/"
 
@@ -95,7 +96,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                             session.commit()
                             continue
         except Exception as e:
-            print(e.with_traceback())
+            print(e)
             pass
 
     @app_commands.guild_only()
@@ -145,36 +146,82 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
         await interaction.response.send_message(content=f"방송 시작이 감지되면 아래와 같이 메세지가 발송됩니다.\n\n{alert_text if alert_text else ''}", embed=embed, view=view, delete_after=15)
 
     @app_commands.guild_only()
-    @app_commands.command(name="끄기", description="방송 알림을 비활성화합니다.")
+    @app_commands.command(name="끄기", description="방송 알림을 비활성화합니다. 고유 알림 ID가 없으면 모든 알림을 비활성화합니다.")
+    @app_commands.describe(alert_uuid="고유 알림 ID")
     @app_commands.checks.has_permissions(manage_guild=True)
-    async def _alert_disable(self, interaction: discord.Interaction) -> None:
+    async def _alert_disable(self, interaction: discord.Interaction, alert_uuid: typing.Optional[str]) -> None:
         with DB().getSession() as session:
             statements = session.query(
-                Guild).filter_by(guild_id=interaction.guild.id).first()
+                Guild).filter_by(guild_id=interaction.guild.id).all()
+            if alert_uuid != None and alert_uuid != '':
+                for statement in statements:
+                    if statement.uuid == alert_uuid:
+                        statements = statement
+                        break
             if statements == None:
                 await interaction.response.send_message("방송 알림이 설정되어있지 않습니다.")
                 return
             else:
-                statements.activated = False
-                session.commit()
-                await interaction.response.send_message("방송 알림을 비활성화하였습니다.")
-                return
+                if alert_uuid != None and alert_uuid != '':
+                    statements.activated = False
+                    session.commit()
+                else:
+                    for statement in statements:
+                        statement.activated = False
+                        session.commit()
+            await interaction.response.send_message(f"방송 알림{'' if alert_uuid != None and alert_uuid != '' else '들'}을 비활성화하였습니다.")
 
     @app_commands.guild_only()
-    @app_commands.command(name="켜기", description="방송 알림을 활성화합니다.")
+    @app_commands.command(name="켜기", description="방송 알림을 활성화합니다. 고유 알림 ID가 없으면 모든 알림을 비활성화합니다.")
+    @app_commands.describe(alert_uuid="고유 알림 ID")
     @app_commands.checks.has_permissions(manage_guild=True)
-    async def _alert_enable(self, interaction: discord.Interaction) -> None:
+    async def _alert_enable(self, interaction: discord.Interaction, alert_uuid: typing.Optional[str]) -> None:
         with DB().getSession() as session:
             statements = session.query(
-                Guild).filter_by(guild_id=interaction.guild.id).first()
+                Guild).filter_by(guild_id=interaction.guild.id).all()
+            if alert_uuid != None and alert_uuid != '':
+                for statement in statements:
+                    if statement.uuid == alert_uuid:
+                        statements = statement
+                        break
             if statements == None:
                 await interaction.response.send_message("방송 알림이 설정되어있지 않습니다.")
                 return
             else:
-                statements.activated = True
-                session.commit()
-                await interaction.response.send_message("방송 알림을 활성화하였습니다.")
+                if alert_uuid != None and alert_uuid != '':
+                    statements.activated = True
+                    session.commit()
+                else:
+                    for statement in statements:
+                        statement.activated = True
+                        session.commit()
+            await interaction.response.send_message(f"방송 알림{'' if alert_uuid != None and alert_uuid != '' else '들'}을 활성화하였습니다.")
+
+    @app_commands.guild_only()
+    @app_commands.command(name="삭제", description="방송 알림 등록 정보를 삭제합니다. 고유 알림 ID가 없으면 모든 알림을 삭제합니다.")
+    @app_commands.describe(alert_uuid="고유 알림 ID")
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def _alert_delete(self, interaction: discord.Interaction, alert_uuid: typing.Optional[str]) -> None:
+        with DB().getSession() as session:
+            statements = session.query(
+                Guild).filter_by(guild_id=interaction.guild.id).all()
+            if alert_uuid != None and alert_uuid != '':
+                for statement in statements:
+                    if statement.uuid == alert_uuid:
+                        statements = statement
+                        break
+            if statements == None:
+                await interaction.response.send_message("방송 알림이 설정되어있지 않습니다.")
                 return
+            else:
+                if alert_uuid != None and alert_uuid != '':
+                    session.delete(statements)
+                    session.commit()
+                else:
+                    for statement in statements:
+                        session.delete(statement)
+                        session.commit()
+            await interaction.response.send_message(f"방송 알림{'' if alert_uuid != None and alert_uuid != '' else '들'}을 삭제하였습니다.")
 
     @app_commands.guild_only()
     @app_commands.command(name="정보", description="방송 알림 정보를 출력합니다.")
@@ -182,36 +229,36 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
     async def _alert_info(self, interaction: discord.Interaction) -> None:
         with DB().getSession() as session:
             statements = session.query(
-                Guild).filter_by(guild_id=interaction.guild.id).first()
-            if statements == None:
+                Guild).filter_by(guild_id=interaction.guild.id).all()
+            if statements == None or statements == []:
                 await interaction.response.send_message("방송 알림이 설정되어있지 않습니다.")
                 return
             else:
-                streamer_info = await self.fetch_streamer_info(statements.streamer_id)
-                streamer_info = streamer_info["content"]
+                async def get_page(page: int):
+                    limit = 5
+                    embed = discord.Embed(
+                        title="ℹ️ 방송알림 등록 정보", description="현재 이 서버에 등록된 방송 알림 정보 입니다.", color=0x00ff00)
+                    offset = (page-1) * limit
+                    for statement in statements[offset:offset+limit]:
 
-                if streamer_info["channelId"] is None:
-                    await interaction.response.send_message("채널을 찾을 수 없습니다.")
-                    return
+                        streamer_info = await self.fetch_streamer_info(statement.streamer_id)
+                        streamer_info = streamer_info["content"]
 
-                stream_info_data = await self.fetch_stream_info(statements.streamer_id)
-                stream_info_data = stream_info_data["content"]
+                        if streamer_info["channelId"] is None:
+                            await interaction.response.send_message("채널을 찾을 수 없습니다.")
+                            return
 
-                embed = discord.Embed(
-                    title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00ff00)
-                embed.url = f"https://chzzk.naver.com/{statements.streamer_id}"
-                embed.set_footer(text=statements.streamer_id)
-                embed.timestamp = discord.utils.utcnow()
-                embed.set_image(
-                    url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
-                embed.set_thumbnail(url=streamer_info["channelImageUrl"])
-                embed.add_field(
-                    name="시청자 수", value=f"{stream_info_data['concurrentUserCount']}명")
-                embed.add_field(
-                    name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}")
+                        stream_info_data = await self.fetch_stream_info(statement.streamer_id)
+                        stream_info_data = stream_info_data["content"]
 
-                await interaction.response.send_message(content=f"방송 시작이 감지되면 아래와 같이 메세지가 발송됩니다.\n\n{statements.alert_text if statements.alert_text else ''}", embed=embed, delete_after=15)
-                return
+                        embed.add_field(
+                            name=f"🔑 고유 알림 ID [``{statement.uuid}``]", value=f"채널: [{streamer_info['channelName']}](https://chzzk.naver.com/{statement.streamer_id})\n알림 채널: <#{statement.alert_channel}>\n알림 메세지: {statement.alert_text if statement.alert_text else '없음'}\n활성화 여부: {'활성화' if statement.activated else '비활성화'}", inline=False)
+                    n = StreamAlertInfo.compute_total_pages(
+                        len(statements), limit)
+                    embed.set_footer(text=f"{page} / {n} 페이지")
+                    return embed, n
+
+                await StreamAlertInfo(interaction, get_page).navigate()
 
     @_set_stream_alert.error
     async def _set_stream_alert_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
