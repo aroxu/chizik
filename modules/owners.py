@@ -18,8 +18,9 @@ class Owners(commands.Cog, name="관리자 전용"):
     @app_commands.command(name="sync", description="명령어를 동기화 합니다.")
     @commands.is_owner()
     async def _sync(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer(ephemeral=True, thinking=True)
         if interaction.user.id not in SECRETS.owners:
-            return await interaction.response.send_message("당신은 봇의 소유자가 아닙니다.", ephemeral=True)
+            return await interaction.followup.send_message("당신은 봇의 소유자가 아닙니다.", ephemeral=True)
         ret = 0
         for guild in self.bot.guilds:
             try:
@@ -29,7 +30,7 @@ class Owners(commands.Cog, name="관리자 전용"):
             else:
                 ret += 1
 
-        await interaction.response.send_message(f"{ret}/{len(self.bot.guilds)} 서버에 동기화를 완료했습니다.", ephemeral=True)
+        await interaction.followup.send(content=f"{ret}/{len(self.bot.guilds)} 서버에 동기화를 완료했습니다.", ephemeral=True)
 
     @app_commands.command(name="reload", description="모듈을 다시 로드합니다.")
     @app_commands.describe(module="대상 모듈")
