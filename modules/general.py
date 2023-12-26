@@ -24,7 +24,7 @@ class General(commands.Cog):
             title="치직",
             description=f"봇 버전: **{SECRETS.version}**\n봇 개발자: **<@294146247512555521>(@aroxu)**", color=0x00fea5)
         embed.add_field(name="Discord 관련 정보",
-                        value=f"서버 수: **{len(self.bot.guilds)}**\n유저 수: **{len(self.bot.users)}**\n핑: **{round(self.bot.latency * 1000)}ms**", inline=False)
+                        value=f"서버 수: **{len(self.bot.guilds)}**\n핑: **{round(self.bot.latency * 1000)}ms**", inline=False)
         embed.add_field(
             name="호스트 정보", value=f"OS: {platform.platform()}\n봇의 CPU 사용량: {psutil.cpu_percent()}%\n봇의 RAM 사용량: {round(mem, 2)}%", inline=False)
 
