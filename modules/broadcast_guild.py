@@ -73,7 +73,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                             statement.is_streaming = True
                             session.commit()
                             embed = discord.Embed(
-                                title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00ff00)
+                                title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
                             embed.url = f"https://chzzk.naver.com/{statement.streamer_id}"
                             embed.set_footer(text=statement.streamer_id)
                             embed.timestamp = discord.utils.utcnow()
@@ -128,7 +128,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
         stream_info_data = stream_info_data["content"]
 
         embed = discord.Embed(
-            title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00ff00)
+            title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
         embed.url = f"https://chzzk.naver.com/{channel_id}"
         embed.set_footer(text=channel_id)
         embed.timestamp = discord.utils.utcnow()
@@ -237,7 +237,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                 async def get_page(page: int):
                     limit = 5
                     embed = discord.Embed(
-                        title="ℹ️ 방송알림 등록 정보", description="현재 이 서버에 등록된 방송 알림 정보 입니다.", color=0x00ff00)
+                        title="ℹ️ 방송알림 등록 정보", description="현재 이 서버에 등록된 방송 알림 정보 입니다.", color=0x00fea5)
                     offset = (page-1) * limit
                     for statement in statements[offset:offset+limit]:
 

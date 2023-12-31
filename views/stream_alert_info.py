@@ -16,7 +16,7 @@ class StreamAlertInfo(discord.ui.View):
         else:
             emb = discord.Embed(
                 description=f"명령어를 사용한 사람만 반응할 수 있습니다.",
-                color=16711680
+                color=0xff0000
             )
             await interaction.response.send_message(embed=emb, ephemeral=True)
             return False
