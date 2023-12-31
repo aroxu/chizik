@@ -204,7 +204,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
     async def _alert_delete(self, interaction: discord.Interaction, alert_uuid: typing.Optional[str]) -> None:
         with DB().getSession() as session:
             statements = session.query(
-                Guild).filter_by(guild_id=interaction.guild.id).all()
+                Guild).filter_by(guild_id=interaction.guild.id).first()
             if alert_uuid != None and alert_uuid != '':
                 for statement in statements:
                     if statement.uuid == alert_uuid:
