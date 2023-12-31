@@ -16,6 +16,7 @@ class Owners(commands.Cog, name="관리자 전용"):
 
     @app_commands.guild_only()
     @app_commands.command(name="sync", description="명령어를 동기화 합니다.")
+    @app_commands.check(lambda interaction: interaction.user.id in SECRETS.owners)
     @commands.is_owner()
     async def _sync(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer(ephemeral=True, thinking=True)
@@ -34,6 +35,7 @@ class Owners(commands.Cog, name="관리자 전용"):
 
     @app_commands.command(name="reload", description="모듈을 다시 로드합니다.")
     @app_commands.describe(module="대상 모듈")
+    @app_commands.check(lambda interaction: interaction.user.id in SECRETS.owners)
     @commands.is_owner()
     async def _reload(self, interaction: discord.Interaction, module: str = None) -> None:
         if interaction.user.id not in SECRETS.owners:
@@ -69,6 +71,7 @@ class Owners(commands.Cog, name="관리자 전용"):
 
     @app_commands.command(name="load", description="모듈을 로드합니다.")
     @app_commands.describe(module="대상 모듈")
+    @app_commands.check(lambda interaction: interaction.user.id in SECRETS.owners)
     @commands.is_owner()
     async def _load(self, interaction: discord.Interaction, module: str) -> None:
         if interaction.user.id not in SECRETS.owners:
@@ -100,6 +103,7 @@ class Owners(commands.Cog, name="관리자 전용"):
 
     @app_commands.command(name="unload", description="모듈을 언로드합니다.")
     @app_commands.describe(module="대상 모듈")
+    @app_commands.check(lambda interaction: interaction.user.id in SECRETS.owners)
     @commands.is_owner()
     async def _unload(self, interaction: discord.Interaction, module: str) -> None:
         if interaction.user.id not in SECRETS.owners:
