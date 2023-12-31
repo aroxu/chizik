@@ -30,6 +30,13 @@ class General(commands.Cog):
 
         await interaction.response.send_message(embed=embed)
 
+    @app_commands.command(name="지원", description="지원서버의 초대 링크를 보여줍니다.")
+    async def _support(self, interaction: discord.Interaction) -> None:
+        embed = discord.Embed(
+            title="지원서버 초대 링크", description="https://discord.gg/3cr7mduVh4", color=0x00fea5)
+        embed.set_footer(text="지원서버에서 봇의 버그를 제보하거나, 봇에 대한 질문을 할 수 있습니다.")
+        await interaction.response.send_message(embed=embed)
+
 
 async def setup(bot: commands.Bot) -> None:
     cog = General(bot)
