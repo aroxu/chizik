@@ -153,3 +153,4 @@ cython_debug/
 
 SECRETS.py
 chzzk_data.db
+container/db/data_importer.sql
