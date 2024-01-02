@@ -1,8 +1,12 @@
-from sqlalchemy import create_engine, Column, Text, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import os
+
+from dotenv import load_dotenv
+from peewee import MySQLDatabase, Model
+
 import threading
 
+
+load_dotenv()
 
 class SingletonInstance:
     _instance = None
@@ -24,23 +28,27 @@ class SingletonInstance:
     def initialize(self, *args, **kwargs):
         pass  # Override this method in subclasses if needed
 
-
 class DB(SingletonInstance):
     def initialize(self):
-        self._engine = create_engine(
-            "sqlite:///chzzk_data.db",
-            echo=False
+        self._db = MySQLDatabase(
+            str(os.environ.get("MYSQL_DATABASE")),
+            host="db", # str(os.environ.get("MYSQL_HOST")),
+            port=int(os.environ.get("MYSQL_PORT")),
+            user=str(os.environ.get("MYSQL_USER")),
+            password=str(os.environ.get("MYSQL_PASSWORD"))
         )
-        self._Base = declarative_base()
-        self._Session = sessionmaker(
-            autocommit=False, autoflush=False, bind=self._engine)
-
+    
     @property
     def Base(self):
-        return self._Base
+        return self._db
+    
+    def create_all(self, models: list[Model]):
+        self.Base.create_tables(models)
 
-    def create_all(self):
-        self._Base.metadata.create_all(self._engine)
+    def connect(self):
+        self.Base.connect()
 
-    def getSession(self):
-        return self._Session()
+class BaseModel(Model):
+    class Meta:
+        database = DB().Base
+    
