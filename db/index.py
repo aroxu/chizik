@@ -5,6 +5,7 @@ from peewee import MySQLDatabase, Model
 
 import threading
 
+
 load_dotenv()
 
 class SingletonInstance:

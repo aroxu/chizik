@@ -1,5 +1,4 @@
 discord.py
-sqlalchemy
 peewee
 pymysql
 psutil
