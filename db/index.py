@@ -1,13 +1,16 @@
 import os
 
+from dotenv import load_dotenv
 from peewee import MySQLDatabase, Model
 
 import threading
 
+load_dotenv()
+
 class SingletonInstance:
     _instance = None
     _lock = threading.Lock()
-    
+
     def __new__(cls, *args, **kwargs):
         with cls._lock:
             if not cls._instance:
@@ -28,11 +31,10 @@ class DB(SingletonInstance):
     def initialize(self):
         self._db = MySQLDatabase(
             str(os.environ.get("MYSQL_DATABASE")),
-            host=str(os.environ.get("MYSQL_HOST")),
+            host="db", # str(os.environ.get("MYSQL_HOST")),
             port=int(os.environ.get("MYSQL_PORT")),
             user=str(os.environ.get("MYSQL_USER")),
-            password=str(os.environ.get("MYSQL_PASSWORD")),
-            autocommit=False
+            password=str(os.environ.get("MYSQL_PASSWORD"))
         )
     
     @property

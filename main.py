@@ -54,7 +54,6 @@ class Chizik(commands.AutoShardedBot):
 
 
 async def run():
-    load_dotenv()
     logging.basicConfig(level=logging.INFO)
     DB().connect()
     DB().create_all(models)

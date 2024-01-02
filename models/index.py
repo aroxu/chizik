@@ -1,3 +1,3 @@
-from models.guild import Guild
+from models.alert import Alert
 
-models = [Guild]
+models = [Alert]

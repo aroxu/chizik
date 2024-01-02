@@ -1,16 +1,16 @@
 from uuid import uuid4
-from peewee import BooleanField, TextField
+from peewee import BooleanField, TextField, UUIDField
 
-from db.index import DB, BaseModel
+from db.index import BaseModel
 
-class Guild(BaseModel):
+class Alert(BaseModel):
     guild_id = TextField()
     streamer_id = TextField()
     alert_channel = TextField()
     alert_text = TextField()
     activated = BooleanField()
     is_streaming = BooleanField()
-    uuid = TextField(primary_key=True, default=str(uuid4()))
+    uuid = UUIDField(primary_key=True, default=uuid4)
 
     class Meta:
-        db_table = "guilds"
+        table_name = "alerts"

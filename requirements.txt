@@ -3,3 +3,4 @@ sqlalchemy
 peewee
 pymysql
 psutil
+python-dotenv
