@@ -1,13 +1,15 @@
 import asyncio
 import logging
 from pathlib import Path
+from dotenv import load_dotenv
 
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import CommandNotFound
 
+from db.index import DB
+from models.index import models
 import SECRETS
-
 
 class Chizik(commands.AutoShardedBot):
     def __init__(self, **kwargs):
@@ -52,7 +54,10 @@ class Chizik(commands.AutoShardedBot):
 
 
 async def run():
+    load_dotenv()
     logging.basicConfig(level=logging.INFO)
+    DB().connect()
+    DB().create_all(models)
     chizik = Chizik(config=SECRETS)
     await chizik.start(SECRETS.bot_token)
 
