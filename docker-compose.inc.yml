@@ -4,20 +4,18 @@ services:
     container_name: chizik_bot
     depends_on:
     - db
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
+    restart: unless-stopped
     command: sh -c "
         apk add gcc musl-dev libffi-dev openssl-dev
         && pip3 install -r requirements.txt
-        && python3 -u main.py"
+        && uvicorn main:app --host 0.0.0.0 --port ${API_PORT}"
     env_file: .env
     environment:
-      FAST_API_PORT: FAST_API_PORT
       TZ: Asia/Seoul
     networks:
       - backend
+    ports:
+      - "${API_PORT}:8080"
     image: python:alpine
     volumes:
     - /mnt/w/Python/chizik:/srv
@@ -35,7 +33,7 @@ services:
       TZ: Asia/Seoul
     networks:
       - backend
-    restart: always
+    restart: unless-stopped
 
 networks:
   backend:
