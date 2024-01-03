@@ -63,7 +63,6 @@ chizik = Chizik(config=SECRETS)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logging.basicConfig(level=logging.INFO)
-    DB().connect()
     DB().create_all(models)
     asyncio.ensure_future(chizik.start(SECRETS.bot_token))
     try:
@@ -84,15 +83,14 @@ async def root():
 async def guilds():
     result = []
     for guild in chizik.guilds:
-        result.append({"id": guild.id, "name": guild.name})
+        result.append({"id": f"{guild.id}", "name": f"{guild.name}"})
 
     return result
 
 
 @app.get("/guilds/{guild_id}")
 async def guild(guild_id):
-    guild = await chizik.fetch_guild(int(guild_id))
-    print(guild)
+    guild = chizik.get_guild(int(guild_id))
     alerts = Alert.select().where(Alert.guild_id == guild_id)
     result = []
     for alert in alerts:
