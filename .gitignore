@@ -156,3 +156,4 @@ chzzk_data.db
 container
 container/db/data_importer.sql
 docker-compose.yml
+.idea/

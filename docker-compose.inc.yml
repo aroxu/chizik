@@ -12,7 +12,7 @@ services:
         apk add gcc musl-dev libffi-dev openssl-dev
         && pip3 install -r requirements.txt
         && python3 -u main.py"
-    
+    env_file: .env
     environment:
       FAST_API_PORT: FAST_API_PORT
       TZ: Asia/Seoul
