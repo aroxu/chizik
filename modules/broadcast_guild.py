@@ -70,8 +70,8 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                     if statement.is_streaming == True:
                         continue
                     else:
-                        statement.is_streaming = True
-                        statement.save()
+                        Alert.update(is_streaming=True).where(
+                            Alert.uuid == statement.uuid).execute()
                         embed = discord.Embed(
                             title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
                         embed.url = f"https://chzzk.naver.com/{statement.streamer_id}"
@@ -93,7 +93,8 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                         continue
                     else:
                         statement.is_streaming = False
-                        statement.save()
+                        Alert.update(is_streaming=False).where(
+                            Alert.uuid == statement.uuid).execute()
                         continue
         except Exception as e:
             print(e)
@@ -151,20 +152,23 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
     @app_commands.checks.has_permissions(manage_guild=True)
     async def _alert_disable(self, interaction: discord.Interaction, alert_uuid: typing.Optional[str]) -> None:
         try:
-            guild_alerts = Alert.select().where(Alert.guild_id == interaction.guild.id).count()
+            guild_alerts = Alert.select().where(
+                Alert.guild_id == interaction.guild.id).count()
             if guild_alerts == 0:
                 await interaction.response.send_message("방송 알림이 설정되어 있지 않습니다.")
                 return
-            
+
             bulk_edited = False
             if alert_uuid == None or alert_uuid == '':
-                statement = Alert.update(activated=False).where(Alert.guild_id == interaction.guild.id)
+                statement = Alert.update(activated=False).where(
+                    Alert.guild_id == interaction.guild.id)
                 statement.execute()
                 bulk_edited = True
             else:
-                statement = Alert.update(activated=False).where(Alert.guild_id == interaction.guild.id, Alert.uuid == UUID(alert_uuid))
+                statement = Alert.update(activated=False).where(
+                    Alert.guild_id == interaction.guild.id, Alert.uuid == UUID(alert_uuid))
                 statement.execute()
-                
+
             await interaction.response.send_message(f"방송 알림{'들' if bulk_edited else ''}을 비활성화하였습니다.")
         except Exception as e:
             print(e.traceback.format_exc())
@@ -176,20 +180,23 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
     @app_commands.checks.has_permissions(manage_guild=True)
     async def _alert_enable(self, interaction: discord.Interaction, alert_uuid: typing.Optional[str]) -> None:
         try:
-            guild_alerts = Alert.select().where(Alert.guild_id == interaction.guild.id).count()
+            guild_alerts = Alert.select().where(
+                Alert.guild_id == interaction.guild.id).count()
             if guild_alerts == 0:
                 await interaction.response.send_message("방송 알림이 설정되어 있지 않습니다.")
                 return
-            
+
             bulk_edited = False
             if alert_uuid == None or alert_uuid == '':
-                statement = Alert.update(activated=True).where(Alert.guild_id == interaction.guild.id)
+                statement = Alert.update(activated=True).where(
+                    Alert.guild_id == interaction.guild.id)
                 statement.execute()
                 bulk_edited = True
             else:
-                statement = Alert.update(activated=True).where(Alert.guild_id == interaction.guild.id, Alert.uuid == UUID(alert_uuid))
+                statement = Alert.update(activated=True).where(
+                    Alert.guild_id == interaction.guild.id, Alert.uuid == UUID(alert_uuid))
                 statement.execute()
-                
+
             await interaction.response.send_message(f"방송 알림{'들' if bulk_edited else ''}을 활성화하였습니다.")
         except Exception as e:
             print(e.traceback.format_exc())
@@ -201,20 +208,22 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
     @app_commands.checks.has_permissions(manage_guild=True)
     async def _alert_delete(self, interaction: discord.Interaction, alert_uuid: typing.Optional[str]) -> None:
         try:
-            guild_alerts = Alert.select().where(Alert.guild_id == interaction.guild.id).count()
+            guild_alerts = Alert.select().where(
+                Alert.guild_id == interaction.guild.id).count()
             if guild_alerts == 0:
                 await interaction.response.send_message("방송 알림이 설정되어 있지 않습니다.")
                 return
-            
+
             bulk_edited = False
             if alert_uuid == None or alert_uuid == '':
                 statement = Alert.delete().where(Alert.guild_id == interaction.guild.id)
                 statement.execute()
                 bulk_edited = True
             else:
-                statement = Alert.delete().where(Alert.guild_id == interaction.guild.id, Alert.uuid == UUID(alert_uuid))
+                statement = Alert.delete().where(Alert.guild_id == interaction.guild.id,
+                                                 Alert.uuid == UUID(alert_uuid))
                 statement.execute()
-                
+
             await interaction.response.send_message(f"방송 알림{'들' if bulk_edited else ''}을 삭제하였습니다.")
         except Exception as e:
             print(e.traceback.format_exc())
@@ -258,7 +267,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
         except Exception as e:
             print(e.traceback.format_exc())
             await interaction.response.edit_message(content="오류가 발생하였습니다.", view=None, embed=None, delete_after=5)
-            
+
     @_set_stream_alert.error
     async def _set_stream_alert_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
         if isinstance(error, app_commands.MissingPermissions):
