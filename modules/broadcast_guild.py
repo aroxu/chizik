@@ -54,9 +54,10 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
 
     @tasks.loop(minutes=3)
     async def alert_job(self):
-        try:
-            statements = Alert.select().where(Alert.activated == True).execute()
-            for statement in statements:
+        statements = Alert.select().where(Alert.activated == True).execute()
+        for statement in statements:
+            try:
+                print(f"Checking streamer {statement.streamer_id}...")
                 streamer_info = await self.fetch_streamer_info(statement.streamer_id)
                 streamer_info = streamer_info["content"]
 
@@ -70,8 +71,10 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                     if statement.is_streaming == True:
                         continue
                     else:
-                        statement.is_streaming = True
-                        statement.save()
+                        print("Updating Streaming Status...")
+                        Alert.update(is_streaming=True).where(
+                            Alert.streamer_id == statement.streamer_id).execute()
+                        print("Sending message...")
                         embed = discord.Embed(
                             title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
                         embed.url = f"https://chzzk.naver.com/{statement.streamer_id}"
@@ -92,12 +95,12 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                     if statement.is_streaming == False:
                         continue
                     else:
-                        statement.is_streaming = False
-                        statement.save()
+                        Alert.update(is_streaming=False).where(
+                            Alert.uuid == statement.uuid).execute()
                         continue
-        except Exception as e:
-            print(e)
-            pass
+            except Exception as e:
+                print(e)
+                pass
 
     @app_commands.guild_only()
     @app_commands.command(name="설정", description="방송 알림을 설정합니다.")
@@ -143,7 +146,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
         view = StreamAlertCreateConfirm(timeout=15, interaction=interaction,
                                         channel_id=channel_id, alert_channel=alert_channel, alert_text=alert_text)
 
-        await interaction.response.send_message(content=f"방송 시작이 감지되면 아래와 같이 메세지가 발송됩니다.\n\n{alert_text if alert_text else ''}", embed=embed, view=view, delete_after=15)
+        await interaction.response.send_message(content=f"방송 시작이 감지되면 아래와 같이 메세지가 발송됩니다.\n\n{alert_text if alert_text else ''}", embed=embed, view=view, delete_after=15, ephemeral=True)
 
     @app_commands.guild_only()
     @app_commands.command(name="끄기", description="방송 알림을 비활성화합니다. 고유 알림 ID가 없으면 모든 알림을 비활성화합니다.")

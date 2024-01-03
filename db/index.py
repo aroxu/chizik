@@ -8,6 +8,7 @@ import threading
 
 load_dotenv()
 
+
 class SingletonInstance:
     _instance = None
     _lock = threading.Lock()
@@ -28,27 +29,29 @@ class SingletonInstance:
     def initialize(self, *args, **kwargs):
         pass  # Override this method in subclasses if needed
 
+
 class DB(SingletonInstance):
     def initialize(self):
         self._db = MySQLDatabase(
             str(os.environ.get("MYSQL_DATABASE")),
-            host="db", # str(os.environ.get("MYSQL_HOST")),
+            host="db",  # str(os.environ.get("MYSQL_HOST")),
             port=int(os.environ.get("MYSQL_PORT")),
             user=str(os.environ.get("MYSQL_USER")),
-            password=str(os.environ.get("MYSQL_PASSWORD"))
+            password=str(os.environ.get("MYSQL_PASSWORD")),
+            charset="utf8mb4",
         )
-    
+
     @property
     def Base(self):
         return self._db
-    
+
     def create_all(self, models: list[Model]):
         self.Base.create_tables(models)
 
     def connect(self):
         self.Base.connect()
 
+
 class BaseModel(Model):
     class Meta:
         database = DB().Base
-    
