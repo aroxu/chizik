@@ -54,9 +54,10 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
 
     @tasks.loop(minutes=3)
     async def alert_job(self):
-        try:
-            statements = Alert.select().where(Alert.activated == True).execute()
-            for statement in statements:
+        statements = Alert.select().where(Alert.activated == True).execute()
+        for statement in statements:
+            try:
+                print(f"Checking streamer {statement.streamer_id}...")
                 streamer_info = await self.fetch_streamer_info(statement.streamer_id)
                 streamer_info = streamer_info["content"]
 
@@ -70,8 +71,10 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                     if statement.is_streaming == True:
                         continue
                     else:
+                        print("Updating Streaming Status...")
                         Alert.update(is_streaming=True).where(
-                            Alert.uuid == statement.uuid).execute()
+                            Alert.streamer_id == statement.streamer_id).execute()
+                        print("Sending message...")
                         embed = discord.Embed(
                             title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
                         embed.url = f"https://chzzk.naver.com/{statement.streamer_id}"
@@ -92,13 +95,12 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                     if statement.is_streaming == False:
                         continue
                     else:
-                        statement.is_streaming = False
                         Alert.update(is_streaming=False).where(
                             Alert.uuid == statement.uuid).execute()
                         continue
-        except Exception as e:
-            print(e)
-            pass
+            except Exception as e:
+                print(e)
+                pass
 
     @app_commands.guild_only()
     @app_commands.command(name="설정", description="방송 알림을 설정합니다.")
