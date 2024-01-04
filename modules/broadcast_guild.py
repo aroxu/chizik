@@ -1,10 +1,14 @@
+import asyncio
 import typing
 import aiohttp
 import discord
+import concurrent.futures
+
 
 from discord import app_commands
 from discord.ext import commands
 from discord.ext import tasks
+import psutil
 from models.alert import Alert
 from views.stream_alert import StreamAlertCreateConfirm
 from views.stream_alert_info import StreamAlertInfo
@@ -55,56 +59,73 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
     @tasks.loop(minutes=3)
     async def alert_job(self):
         statements = Alert.select().where(Alert.activated == True).execute()
-        for statement in statements:
-            try:
-                print(f"Checking streamer {statement.streamer_id}...")
-                streamer_info = await self.fetch_streamer_info(statement.streamer_id)
-                streamer_info = streamer_info["content"]
 
-                if streamer_info["channelId"] is None:
-                    continue
+        loop = asyncio.get_event_loop()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1 if int(psutil.cpu_count()) < 2 else int(psutil.cpu_count() / 2)) as executor:
+            futures = [loop.run_in_executor(
+                executor, self.process_statement, statement) for statement in statements]
+            await asyncio.gather(*futures)
 
-                stream_info_data = await self.fetch_stream_info(statement.streamer_id)
-                stream_info_data = stream_info_data["content"]
+    def process_statement(self, statement):
+        try:
+            print(f"Checking streamer {statement.streamer_id}...")
+            streamer_info = asyncio.run_coroutine_threadsafe(
+                self.fetch_streamer_info(statement.streamer_id), self.bot.loop).result()
+            streamer_info = streamer_info["content"] if streamer_info else None
 
-                if streamer_info["openLive"]:
-                    if statement.is_streaming == True:
-                        continue
-                    else:
-                        print("Updating Streaming Status...")
-                        Alert.update(is_streaming=True).where(
-                            Alert.streamer_id == statement.streamer_id).execute()
-                        print("Sending message...")
-                        embed = discord.Embed(
-                            title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
-                        embed.url = f"https://chzzk.naver.com/{statement.streamer_id}"
-                        embed.set_footer(text=statement.streamer_id)
-                        embed.timestamp = discord.utils.utcnow()
-                        embed.set_image(
-                            url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
-                        embed.set_thumbnail(
-                            url=streamer_info["channelImageUrl"])
-                        embed.add_field(
-                            name="시청자 수", value=f"{stream_info_data['concurrentUserCount']}명")
-                        embed.add_field(
-                            name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}")
-                        channel = await self.bot.fetch_channel(statement.alert_channel)
-                        await channel.send(content=statement.alert_text, embed=embed, allowed_mentions=discord.AllowedMentions(everyone=True))
-                        continue
+            if not streamer_info or streamer_info["channelId"] is None:
+                return
+
+            stream_info_data = asyncio.run_coroutine_threadsafe(
+                self.fetch_stream_info(statement.streamer_id), self.bot.loop).result()
+            stream_info_data = stream_info_data["content"] if stream_info_data else None
+
+            if not stream_info_data:
+                return
+
+            if streamer_info["openLive"]:
+                if statement.is_streaming == True:
+                    return
                 else:
-                    if statement.is_streaming == False:
-                        continue
-                    else:
-                        Alert.update(is_streaming=False).where(
-                            Alert.uuid == statement.uuid).execute()
-                        continue
-            except Exception as e:
-                print(e)
-                pass
+                    print("Stream status changed. Updating Streaming Status...")
+                    Alert.update(is_streaming=True).where(
+                        Alert.streamer_id == statement.streamer_id).execute()
+                    print("Sending message...")
+                    embed = discord.Embed(
+                        title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
+                    embed.url = f"https://chzzk.naver.com/{statement.streamer_id}"
+                    embed.set_footer(text=statement.streamer_id)
+                    embed.timestamp = discord.utils.utcnow()
+                    embed.set_image(
+                        url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
+                    embed.set_thumbnail(
+                        url=streamer_info["channelImageUrl"])
+                    embed.add_field(
+                        name="시청자 수", value=f"{stream_info_data['concurrentUserCount']}명")
+                    embed.add_field(
+                        name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}")
+                    channel = asyncio.run_coroutine_threadsafe(
+                        self.bot.fetch_channel(statement.alert_channel), self.bot.loop).result()
+                    asyncio.run_coroutine_threadsafe(channel.send(
+                        content=statement.alert_text, embed=embed, allowed_mentions=discord.AllowedMentions(everyone=True)), self.bot.loop).result()
+                    return
+            else:
+                if statement.is_streaming == False:
+                    return
+                else:
+                    print("Stream status changed. Updating Streaming Status...")
+                    Alert.update(is_streaming=False).where(
+                        Alert.streamer_id == statement.streamer_id).execute()
+                    return
+        except Exception as e:
+            print(f"Error processing statement: {e}")
+            pass
 
     @alert_job.before_loop
     async def before_printer(self):
-        print('waiting...')
+        print('Waiting for bot is ready...')
+        print(
+            f"Using {1 if int(psutil.cpu_count()) < 2 else int(psutil.cpu_count() / 2)} core for alert job")
         await self.bot.wait_until_ready()
 
     @app_commands.guild_only()
