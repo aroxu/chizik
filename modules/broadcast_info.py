@@ -6,7 +6,7 @@ from discord.ext import commands
 from views.stream_detail import StreamDetail
 
 BASE_URL = "https://api.chzzk.naver.com/service/v1/channels/"
-BASE_UR_V2 = "https://api.chzzk.naver.com/service/v1/channels/"
+BASE_UR_V2 = "https://api.chzzk.naver.com/service/v2/channels/"
 
 
 class BroadcastInfo(commands.Cog):

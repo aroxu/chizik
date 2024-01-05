@@ -3,7 +3,7 @@ import discord
 import json
 
 BASE_URL = "https://api.chzzk.naver.com/service/v1/channels/"
-BASE_UR_V2 = "https://api.chzzk.naver.com/service/v1/channels/"
+BASE_UR_V2 = "https://api.chzzk.naver.com/service/v2/channels/"
 
 
 class StreamDetail(discord.ui.View):
