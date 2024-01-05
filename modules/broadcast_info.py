@@ -6,6 +6,7 @@ from discord.ext import commands
 from views.stream_detail import StreamDetail
 
 BASE_URL = "https://api.chzzk.naver.com/service/v1/channels/"
+BASE_UR_V2 = "https://api.chzzk.naver.com/service/v1/channels/"
 
 
 class BroadcastInfo(commands.Cog):
@@ -33,7 +34,7 @@ class BroadcastInfo(commands.Cog):
 
     async def fetch_stream_info(self, channel_id: str):
         try:
-            async with self.session.get(f"{BASE_URL}{channel_id}/live-detail") as streamer_info:
+            async with self.session.get(f"{BASE_UR_V2}{channel_id}/live-detail") as streamer_info:
                 streamer_info.raise_for_status()
                 return await streamer_info.json()
         except aiohttp.ClientResponseError as e:

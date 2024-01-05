@@ -16,6 +16,7 @@ from views.stream_alert_info import StreamAlertInfo
 from uuid import UUID
 
 BASE_URL = "https://api.chzzk.naver.com/service/v1/channels/"
+BASE_URL_V2 = "https://api.chzzk.naver.com/service/v2/channels/"
 
 
 class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
@@ -44,7 +45,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
 
     async def fetch_stream_info(self, channel_id: str):
         try:
-            async with self.session.get(f"{BASE_URL}{channel_id}/live-detail") as streamer_info:
+            async with self.session.get(f"{BASE_URL_V2}{channel_id}/live-detail") as streamer_info:
                 streamer_info.raise_for_status()
                 return await streamer_info.json()
         except aiohttp.ClientResponseError as e:
@@ -93,7 +94,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                     print("Sending message...")
                     embed = discord.Embed(
                         title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
-                    embed.url = f"https://chzzk.naver.com/{statement.streamer_id}"
+                    embed.url = f"https://chzzk.naver.com/live/{statement.streamer_id}"
                     embed.set_footer(text=statement.streamer_id)
                     embed.timestamp = discord.utils.utcnow()
                     embed.set_image(
@@ -158,7 +159,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
 
         embed = discord.Embed(
             title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
-        embed.url = f"https://chzzk.naver.com/{channel_id}"
+        embed.url = f"https://chzzk.naver.com/live/{channel_id}"
         embed.set_footer(text=channel_id)
         embed.timestamp = discord.utils.utcnow()
         embed.set_image(
