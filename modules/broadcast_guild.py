@@ -95,7 +95,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                         Alert.streamer_id == alert.streamer_id).execute()
                     Logger.debug("Sending message...")
                     embed = discord.Embed(
-                        title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
+                        title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5, inline=False)
                     embed.url = f"https://chzzk.naver.com/live/{alert.streamer_id}"
                     embed.set_footer(text=alert.streamer_id)
                     embed.timestamp = discord.utils.utcnow()
@@ -161,7 +161,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
         stream_info_data = stream_info_data["content"]
 
         embed = discord.Embed(
-            title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
+            title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5, inline=False)
         embed.url = f"https://chzzk.naver.com/live/{channel_id}"
         embed.set_footer(text=channel_id)
         embed.timestamp = discord.utils.utcnow()
