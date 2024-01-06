@@ -179,6 +179,32 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
         await interaction.response.send_message(content=f"방송 시작이 감지되면 아래와 같이 메세지가 발송됩니다.\n\n{alert_text if alert_text else ''}", embed=embed, view=view, delete_after=15, ephemeral=True)
 
     @app_commands.guild_only()
+    @app_commands.command(name="수정", description="방송 알림 메세지 수정합니다.")
+    @app_commands.describe(alert_uuid="고유 알림 ID", alert_text="알림과 함께 전송될 메세지")
+    @app_commands.checks.has_permissions(manage_guild=True)
+    async def _alert_modify(self, interaction: discord.Interaction, alert_uuid: str, alert_text: typing.Optional[str]) -> None:
+        try:
+            guild_alerts = Alert.select().where(
+                Alert.guild_id == interaction.guild.id, Alert.uuid == alert_uuid).count()
+            if guild_alerts == 0:
+                await interaction.response.send_message("방송 알림이 설정되어 있지 않습니다.")
+                return
+
+            alert = Alert.get(Alert.guild_id == interaction.guild.id,
+                              Alert.uuid == alert_uuid)
+            if alert == None:
+                await interaction.response.send_message("방송 알림이 설정되어 있지 않습니다.")
+                return
+            else:
+                Alert.update(alert_text=alert_text).where(
+                    Alert.guild_id == interaction.guild.id, Alert.uuid == alert_uuid).execute()
+                await interaction.response.send_message("방송 알림 메세지를 수정하였습니다.")
+
+        except Exception as e:
+            print(e.traceback.format_exc())
+            await interaction.response.edit_message(content="오류가 발생하였습니다.", view=None, embed=None, delete_after=5)
+
+    @app_commands.guild_only()
     @app_commands.command(name="끄기", description="방송 알림을 비활성화합니다. 고유 알림 ID가 없으면 모든 알림을 비활성화합니다.")
     @app_commands.describe(alert_uuid="고유 알림 ID")
     @app_commands.checks.has_permissions(manage_guild=True)
