@@ -96,13 +96,8 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                     Logger.debug("Sending message...")
                     embed = discord.Embed(
                         title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
-<<<<<<< Updated upstream
-                    embed.url = f"https://chzzk.naver.com/live/{statement.streamer_id}"
-                    embed.set_footer(text=statement.streamer_id)
-=======
                     embed.url = f"https://chzzk.naver.com/live/{alert.streamer_id}"
                     embed.set_footer(text=alert.streamer_id)
->>>>>>> Stashed changes
                     embed.timestamp = discord.utils.utcnow()
                     embed.set_image(
                         url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
