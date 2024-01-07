@@ -8,8 +8,10 @@ from discord.ext import commands, tasks
 from discord.ext.commands import CommandNotFound
 
 from db.index import DB
+from models.alert import Alert
 from models.index import models
 import SECRETS
+
 
 class Chizik(commands.AutoShardedBot):
     def __init__(self, **kwargs):
@@ -46,6 +48,11 @@ class Chizik(commands.AutoShardedBot):
 
     async def on_guild_join(self, guild):
         print(f'서버 {guild.name} ({guild.member_count}명의 유저)에 참가하였습니다!')
+
+    async def on_guild_remove(self, guild):
+        print(f'서버 {guild.name} ({guild.member_count}명의 유저)에서 나갔습니다!')
+        Alert.delete().where(Alert.guild_id == guild.id).execute()
+        print(f'서버 {guild.name}와 연결된 모든 데이터를 삭제하였습니다!')
 
     async def on_command_error(self, ctx, reason):
         if isinstance(reason, CommandNotFound):
