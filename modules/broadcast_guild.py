@@ -70,7 +70,6 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
 
     def process_statement(self, alert):
         try:
-            Logger.debug(f"Checking streamer {alert.streamer_id}...")
             streamer_info = asyncio.run_coroutine_threadsafe(
                 self.fetch_streamer_info(alert.streamer_id), self.bot.loop).result()
             streamer_info = streamer_info["content"] if streamer_info else None
@@ -89,11 +88,8 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                 if alert.is_streaming == True:
                     return
                 else:
-                    Logger.debug(
-                        "Stream status changed. Updating Streaming Status...")
                     Alert.update(is_streaming=True).where(
                         Alert.streamer_id == alert.streamer_id).execute()
-                    Logger.debug("Sending message...")
                     embed = discord.Embed(
                         title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
                     embed.url = f"https://chzzk.naver.com/live/{alert.streamer_id}"
@@ -116,8 +112,6 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                 if alert.is_streaming == False:
                     return
                 else:
-                    Logger.debug(
-                        "Stream status changed. Updating Streaming Status...")
                     Alert.update(is_streaming=False).where(
                         Alert.streamer_id == alert.streamer_id).execute()
                     return
