@@ -37,11 +37,11 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                 return await streamer_info.json()
         except aiohttp.ClientResponseError as e:
             # Handle specific HTTP response errors
-            Logger.error(f"Error fetching streamer info: {e}")
+            print(f"Error fetching streamer info: {e}")
             return None
         except Exception as e:
             # Handle other exceptions
-            Logger.error(f"Unexpected error fetching streamer info: {e}")
+            print(f"Unexpected error fetching streamer info: {e}")
             return None
 
     async def fetch_stream_info(self, channel_id: str):
@@ -51,11 +51,11 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                 return await streamer_info.json()
         except aiohttp.ClientResponseError as e:
             # Handle specific HTTP response errors
-            Logger.error(f"Error fetching streamer info: {e}")
+            print(f"Error fetching streamer info: {e}")
             return None
         except Exception as e:
             # Handle other exceptions
-            Logger.error(f"Unexpected error fetching streamer info: {e}")
+            print(f"Unexpected error fetching streamer info: {e}")
             return None
 
     @tasks.loop(minutes=3)
@@ -70,6 +70,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
 
     def process_statement(self, alert):
         try:
+            print(f"Processing statement for {alert.streamer_id}")
             streamer_info = asyncio.run_coroutine_threadsafe(
                 self.fetch_streamer_info(alert.streamer_id), self.bot.loop).result()
             streamer_info = streamer_info["content"] if streamer_info else None
@@ -88,6 +89,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                 if alert.is_streaming == True:
                     return
                 else:
+                    print(f"Streamer {alert.streamer_id} is streaming")
                     Alert.update(is_streaming=True).where(
                         Alert.streamer_id == alert.streamer_id).execute()
                     embed = discord.Embed(
@@ -107,6 +109,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                         self.bot.fetch_channel(alert.alert_channel), self.bot.loop).result()
                     asyncio.run_coroutine_threadsafe(channel.send(
                         content=alert.alert_text, embed=embed, allowed_mentions=discord.AllowedMentions(everyone=True)), self.bot.loop).result()
+                    print(f"Alert sent to {alert.alert_channel}")
                     return
             else:
                 if alert.is_streaming == False:
@@ -116,7 +119,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                         Alert.streamer_id == alert.streamer_id).execute()
                     return
         except Exception as e:
-            Logger.error(f"Error processing statement: {e}")
+            print(f"Error processing statement: {e}")
             pass
 
     @alert_job.before_loop
@@ -155,7 +158,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
         stream_info_data = stream_info_data["content"]
 
         embed = discord.Embed(
-            title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5, inline=False)
+            title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
         embed.url = f"https://chzzk.naver.com/live/{channel_id}"
         embed.set_footer(text=channel_id)
         embed.timestamp = discord.utils.utcnow()
