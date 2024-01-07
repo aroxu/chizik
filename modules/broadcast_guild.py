@@ -288,8 +288,8 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
         await interaction.response.defer()
         try:
             alerts = Alert.select().where(Alert.guild_id == interaction.guild.id).execute()
-            if len(alerts) == 0:
-                await interaction.response.send(content="방송 알림이 설정되어 있지 않습니다.")
+            if len(alerts) == 0 or alerts == None or alerts == []:
+                await interaction.followup.send(content="방송 알림이 설정되어 있지 않습니다.")
                 return
             else:
                 async def get_page(page: int):
@@ -303,7 +303,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                         streamer_info = streamer_info["content"]
 
                         if streamer_info["channelId"] is None:
-                            await interaction.response.send_message("채널을 찾을 수 없습니다.")
+                            await interaction.followup.send(content="채널을 찾을 수 없습니다.")
                             return
 
                         stream_info_data = await self.fetch_stream_info(alert.streamer_id)
@@ -319,7 +319,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                 await StreamAlertInfo(interaction, get_page).navigate()
         except Exception as e:
             print(e.traceback.format_exc())
-            await interaction.response.edit_message(content="오류가 발생하였습니다.", view=None, embed=None, delete_after=5)
+            await interaction.followup.send(content="오류가 발생하였습니다.", view=None, embed=None, delete_after=5)
 
     @_set_stream_alert.error
     async def _set_stream_alert_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
