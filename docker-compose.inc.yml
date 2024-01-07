@@ -17,7 +17,7 @@ services:
       FAST_API_PORT: FAST_API_PORT
       TZ: Asia/Seoul
     networks:
-      - backend
+      - chizik
     image: python:alpine
     volumes:
     - /mnt/w/Python/chizik:/srv
@@ -34,9 +34,26 @@ services:
     environment:
       TZ: Asia/Seoul
     networks:
-      - backend
+      - chizik
     restart: always
 
+  web:
+    image: nodejs:lts-alpine
+    ports:
+      - ${WEB_PORT}:3000
+    volumes:
+    - /mnt/w/Python/chizik:/srv
+    working_dir: /srv/web
+    environment:
+      TZ: Asia/Seoul
+    networks:
+      - chizik
+    restart: always
+    command: sh -c "
+      yarn install
+      && yarn build
+      && yarn start"
+
 networks:
-  backend:
+  chizik:
     driver: bridge

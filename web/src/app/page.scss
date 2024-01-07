@@ -1,0 +1,121 @@
+$primary-500: #00fea5;
+$primary-600: #00dd90;
+$primary-700: #00c580;
+
+// Import Pico
+@import "@picocss/pico/scss/pico";
+
+[data-theme="dark"] {
+  --primary: #00fea5;
+}
+
+.App {
+  background-color: #1e2336;
+}
+
+.App-container {
+  text-align: center;
+  display: flex;
+  @media screen and (max-width: 1024px) {
+    flex-direction: column;
+  }
+  flex-direction: row;
+  justify-content: center;
+}
+
+.App-logo {
+  position: relative;
+  height: 25vmin;
+  width: 25vmin;
+}
+
+.Screenshot {
+  height: 50vmin;
+  width: auto;
+  position: relative;
+  // overflow: hidden;
+}
+
+.Screenshot::before {
+  height: 80vmin;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(236, 64, 64, 0), rgba(255, 255, 255, 1));
+  pointer-events: none;
+  z-index: 1;
+}
+
+.App-logo,
+.Screenshot {
+  transition: transform 0.3s ease-in-out;
+  transition: transform border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  border: 2px solid transparent;
+  border-radius: 8px;
+}
+
+.App-logo:hover,
+.Screenshot:hover {
+  transform: scale(1.05);
+}
+
+.Screenshot:hover {
+  border: 2px solid $primary-500;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.App-left {
+  flex: 1 0 0;
+  height: 100vh;
+  top: 0;
+  position: sticky;
+  min-height: 100vh;
+  @media screen and (max-width: 1024px) {
+    flex: 1;
+    position: relative;
+    height: 75vh;
+    min-height: 75vh;
+  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  overflow-y: auto;
+}
+
+.App-right {
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  overflow-y: auto;
+}
+
+.App-content {
+  padding: 16px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: calc(10px + 2vmin);
+  height: 100vh;
+}
+
+.App-footer {
+  background-color: #18232c;
+  color: white;
+  text-align: center;
+  padding: 4px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
