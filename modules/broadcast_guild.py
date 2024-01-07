@@ -306,8 +306,7 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                         streamer_info = streamer_info["content"]
 
                         if streamer_info["channelId"] is None:
-                            await interaction.followup.send(content="채널을 찾을 수 없습니다.")
-                            return
+                            continue
 
                         stream_info_data = await self.fetch_stream_info(alert.streamer_id)
                         stream_info_data = stream_info_data["content"]
