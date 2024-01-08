@@ -29,11 +29,18 @@ $primary-700: #00c580;
   width: 25vmin;
 }
 
+.Menus {
+  gap: 16px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
 .Screenshot {
   height: 50vmin;
   width: auto;
   position: relative;
-  // overflow: hidden;
 }
 
 .Screenshot::before {

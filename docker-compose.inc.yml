@@ -14,7 +14,6 @@ services:
         && python3 -u main.py"
     env_file: .env
     environment:
-      FAST_API_PORT: FAST_API_PORT
       TZ: Asia/Seoul
     networks:
       - chizik
@@ -24,6 +23,7 @@ services:
     working_dir: /srv
 
   db:
+    container_name: chizik_db
     image: mariadb:10
     ports:
       - 3306:3306
@@ -38,19 +38,23 @@ services:
     restart: always
 
   web:
+    container_name: chizik_web
     image: nodejs:lts-alpine
     ports:
-      - ${WEB_PORT}:3000
+      - 11030:3000
     volumes:
     - /mnt/w/Python/chizik:/srv
     working_dir: /srv/web
+    env_file: .env
     environment:
       TZ: Asia/Seoul
     networks:
       - chizik
     restart: always
     command: sh -c "
-      yarn install
+      cd /srv/web
+      && rm -rf .next
+      && yarn install
       && yarn build
       && yarn start"
 

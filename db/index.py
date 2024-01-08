@@ -51,6 +51,9 @@ class DB(SingletonInstance):
     def connect(self):
         self.Base.connect()
 
+    def close(self):
+        self.Base.close()
+
 
 class BaseModel(Model):
     class Meta:

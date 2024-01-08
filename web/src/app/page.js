@@ -24,22 +24,28 @@ export default function Home() {
             />
             <h3>치지직 스트리머를 위한 디스코드 봇, "치직"</h3>
 
-            <a
-              href="https://discord.com/oauth2/authorize?client_id=1183664649418326079&scope=bot+applications.commands&permissions=149504"
-              role="button"
-              className="outline"
-            >
-              초대하기
-            </a>
+            <div className="Menus">
+              <Link
+                href="https://discord.com/oauth2/authorize?client_id=1183664649418326079&scope=bot+applications.commands&permissions=149504"
+                role="button"
+                className="outline"
+              >
+                초대하기
+              </Link>
+              <Link href="/manage" role="button" className="outline">
+                관리하기
+              </Link>
+            </div>
+
             <br />
-            <a href="https://discord.gg/3cr7mduVh4" role="button" className="contrast outline">
+            <Link href="https://discord.gg/3cr7mduVh4" role="button" className="contrast outline">
               치직 봇 지원 서버
-            </a>
+            </Link>
             <br />
             <p>
-              <a href="https://toss.me/aroxu" target="_blank" rel="noreferrer">
+              <Link href="https://toss.me/aroxu" target="_blank" rel="noreferrer">
                 <span>개발자 도와주기</span>
-              </a>
+              </Link>
             </p>
           </div>
         </div>
