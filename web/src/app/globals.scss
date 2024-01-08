@@ -1,0 +1,26 @@
+$primary-500: #00fea5;
+$primary-600: #00dd90;
+$primary-700: #00c580;
+
+// Import Pico
+@import "@picocss/pico/scss/pico";
+
+[data-theme="dark"] {
+  --primary: #00fea5;
+}
+
+* {
+  word-break: keep-all;
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+main {
+  padding: 0px !important;
+  margin: 0px !important;
+}

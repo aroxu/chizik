@@ -8,6 +8,7 @@ class StreamAlertInfo(discord.ui.View):
         self.get_page = get_page
         self.total_pages: Optional[int] = None
         self.index = 1
+        self.followup_message = None
         super().__init__(timeout=30)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
@@ -18,21 +19,22 @@ class StreamAlertInfo(discord.ui.View):
                 description=f"명령어를 사용한 사람만 반응할 수 있습니다.",
                 color=0xff0000
             )
-            await interaction.response.send_message(embed=emb, ephemeral=True)
+            await interaction.followup.send_message(embed=emb, ephemeral=True)
             return False
 
     async def navigate(self):
         emb, self.total_pages = await self.get_page(self.index)
         if self.total_pages == 1:
-            await self.interaction.response.send_message(embed=emb)
+            await self.interaction.followup.send(embed=emb)
         elif self.total_pages > 1:
             self.update_buttons()
-            await self.interaction.response.send_message(embed=emb, view=self)
+            self.followup_message = await self.interaction.followup.send(embed=emb, view=self)
 
     async def edit_page(self, interaction: discord.Interaction):
         emb, self.total_pages = await self.get_page(self.index)
         self.update_buttons()
-        await interaction.response.edit_message(embed=emb, view=self)
+        await interaction.response.defer()
+        await self.interaction.edit_original_response(embed=emb, view=self)
 
     def update_buttons(self):
         if self.index > self.total_pages // 2:
