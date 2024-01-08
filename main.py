@@ -1,11 +1,12 @@
 import asyncio
+from contextlib import asynccontextmanager
 import logging
 from pathlib import Path
-from dotenv import load_dotenv
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 from discord.ext.commands import CommandNotFound
+from fastapi import FastAPI
 
 from db.index import DB
 from models.alert import Alert
@@ -16,6 +17,7 @@ import SECRETS
 class Chizik(commands.AutoShardedBot):
     def __init__(self, **kwargs):
         intent = discord.Intents.default()
+        intent.guilds = True
         super().__init__(command_prefix="", intents=intent, activity=discord.Activity(
             type=discord.ActivityType.listening, name="치지직.. 신호"))
         self.remove_command("help")
@@ -60,11 +62,49 @@ class Chizik(commands.AutoShardedBot):
         print(f'명령어 오류 발생:\n{reason}')
 
 
-async def run():
-    logging.basicConfig(level=logging.INFO)
-    DB().connect()
-    DB().create_all(models)
-    chizik = Chizik(config=SECRETS)
-    await chizik.start(SECRETS.bot_token)
+chizik = Chizik(config=SECRETS)
 
-asyncio.run(run())
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logging.basicConfig(level=logging.INFO)
+    DB().create_all(models)
+    asyncio.ensure_future(chizik.start(SECRETS.bot_token))
+    try:
+        yield
+    finally:
+        await chizik.close()
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+
+@app.get("/guilds")
+async def guilds():
+    result = []
+    for guild in chizik.guilds:
+        result.append({"id": f"{guild.id}", "name": f"{guild.name}"})
+
+    return result
+
+
+@app.get("/guilds/{guild_id}")
+async def guild(guild_id):
+    guild = chizik.get_guild(int(guild_id))
+    alerts = Alert.select().where(Alert.guild_id == guild_id)
+    result = []
+    for alert in alerts:
+        result.append({
+            "uuid": alert.uuid,
+            "streamer_id": alert.streamer_id,
+            "alert_channel": alert.alert_channel,
+            "alert_text": alert.alert_text,
+            "activated": alert.activated,
+            "is_streaming": alert.is_streaming
+        })
+    return {"id": guild_id, "name": guild.name, "alert_info": result}

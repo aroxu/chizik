@@ -32,6 +32,8 @@ class SingletonInstance:
 
 class DB(SingletonInstance):
     def initialize(self):
+        if hasattr(self, "_db"):
+            self.close()
         self._db = MySQLDatabase(
             str(os.environ.get("MYSQL_DATABASE")),
             host="db",  # str(os.environ.get("MYSQL_HOST")),
@@ -50,6 +52,9 @@ class DB(SingletonInstance):
 
     def connect(self):
         self.Base.connect()
+
+    def close(self):
+        self.Base.close()
 
 
 class BaseModel(Model):
