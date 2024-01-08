@@ -93,18 +93,17 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                     Alert.update(is_streaming=True).where(
                         Alert.streamer_id == alert.streamer_id).execute()
                     embed = discord.Embed(
-                        title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
+                        title=stream_info_data["liveTitle"], color=0x00fea5)
                     embed.url = f"https://chzzk.naver.com/live/{alert.streamer_id}"
+                    embed.set_author(name=streamer_info["channelName"],
+                                     url=f"https://chzzk.naver.com/{alert.streamer_id}", icon_url=streamer_info["channelImageUrl"])
                     embed.set_footer(text=alert.streamer_id)
                     embed.timestamp = discord.utils.utcnow()
                     embed.set_image(
                         url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
-                    embed.set_thumbnail(
-                        url=streamer_info["channelImageUrl"])
                     embed.add_field(
-                        name="시청자 수", value=f"{stream_info_data['concurrentUserCount']}명")
-                    embed.add_field(
-                        name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}")
+                        name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}".replace("talk", "토크"))
+
                     channel = asyncio.run_coroutine_threadsafe(
                         self.bot.fetch_channel(alert.alert_channel), self.bot.loop).result()
                     asyncio.run_coroutine_threadsafe(channel.send(
@@ -158,17 +157,16 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
         stream_info_data = stream_info_data["content"]
 
         embed = discord.Embed(
-            title=streamer_info["channelName"], description=streamer_info["channelDescription"], color=0x00fea5)
+            title=stream_info_data["liveTitle"], color=0x00fea5)
         embed.url = f"https://chzzk.naver.com/live/{channel_id}"
+        embed.set_author(name=streamer_info["channelName"],
+                         url=f"https://chzzk.naver.com/{channel_id}", icon_url=streamer_info["channelImageUrl"])
         embed.set_footer(text=channel_id)
         embed.timestamp = discord.utils.utcnow()
         embed.set_image(
             url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
-        embed.set_thumbnail(url=streamer_info["channelImageUrl"])
         embed.add_field(
-            name="시청자 수", value=f"{stream_info_data['concurrentUserCount']}명")
-        embed.add_field(
-            name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}")
+            name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}".replace("talk", "토크"))
 
         view = StreamAlertCreateConfirm(timeout=15, interaction=interaction,
                                         channel_id=channel_id, alert_channel=alert_channel, alert_text=alert_text)
@@ -306,6 +304,8 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                         streamer_info = streamer_info["content"]
 
                         if streamer_info["channelId"] is None:
+                            embed.add_field(
+                                name=f"🔑 고유 알림 ID [``{alert.uuid}``]", value=f"채널: 해당 채널은 존재하지 않습니다.\n알림 채널: <#{alert.alert_channel}>\n알림 메세지: {alert.alert_text if alert.alert_text else '없음'}\n활성화 여부: {'활성화' if alert.activated else '비활성화'}", inline=False)
                             continue
 
                         stream_info_data = await self.fetch_stream_info(alert.streamer_id)
@@ -340,6 +340,11 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
 
     @_alert_info.error
     async def _alert_info_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
+        if isinstance(error, app_commands.MissingPermissions):
+            await interaction.response.send_message(content="이 명령어를 실행할 권한이 없는 것 같습니다.")
+
+    @_alert_modify.error
+    async def _alert_modify_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
         if isinstance(error, app_commands.MissingPermissions):
             await interaction.response.send_message(content="이 명령어를 실행할 권한이 없는 것 같습니다.")
 
