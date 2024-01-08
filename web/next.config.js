@@ -9,6 +9,10 @@ const nextConfig = {
       source: "/api/chizik/:path*",
       destination: "http://chizik_bot:11020/:path*",
     },
+    {
+      source: "/api/discord/:path*",
+      destination: "https://discord.com/api/:path*",
+    },
   ],
 };
 
