@@ -19,7 +19,7 @@ const SignIn = () => {
         <>
           <FontAwesomeIcon className="LoadingIcon" icon={faRefresh} size="6x" />
           <br />
-          <h4>로딩 중...</h4>
+          <h4>로드 중...</h4>
           <p>잠시만 기다려 주세요</p>
         </>
       ) : (

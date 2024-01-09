@@ -4,7 +4,7 @@ import discord
 from models.alert import Alert
 
 BASE_URL = "https://api.chzzk.naver.com/service/v1/channels/"
-BASE_UR_V2 = "https://api.chzzk.naver.com/service/v2/channels/"
+BASE_URL_V2 = "https://api.chzzk.naver.com/service/v2/channels/"
 
 
 class StreamAlertCreateConfirm(discord.ui.View):

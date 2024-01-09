@@ -7,13 +7,16 @@ const nextConfig = {
   rewrites: async () => [
     {
       source: "/api/chizik/:path*",
-      destination: "http://chizik_bot:11020/:path*",
+      destination: `http://${process.env.API_HOST}:${process.env.API_PORT}/:path*`,
     },
     {
       source: "/api/discord/:path*",
       destination: "https://discord.com/api/:path*",
     },
   ],
+  images: {
+    domains: ["cdn.discordapp.com"],
+  },
 };
 
 module.exports = nextConfig;

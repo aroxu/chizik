@@ -3,7 +3,7 @@ import discord
 import json
 
 BASE_URL = "https://api.chzzk.naver.com/service/v1/channels/"
-BASE_UR_V2 = "https://api.chzzk.naver.com/service/v2/channels/"
+BASE_URL_V2 = "https://api.chzzk.naver.com/service/v2/channels/"
 
 
 class StreamDetail(discord.ui.View):
@@ -17,8 +17,14 @@ class StreamDetail(discord.ui.View):
         embed = interaction.message.embeds[0]
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                    f"{BASE_UR_V2}{embed.footer.text}/live-detail") as stream_info_for_nerds:
+                    f"{BASE_URL_V2}{embed.footer.text}/live-detail") as stream_info_for_nerds:
                 _stream_info_for_nerds = await stream_info_for_nerds.json()
+
+                if _stream_info_for_nerds["content"]["livePlaybackJson"] == None:
+                    await interaction.response.edit_message(content="치지직 정책에 의해 연령제한 방송은 정보를 확인할 수 없습니다.", view=None)
+                    self.value = True
+                    self.stop()
+                    return
 
                 stream_info_for_nerds = json.loads(
                     _stream_info_for_nerds["content"]["livePlaybackJson"]

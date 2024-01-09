@@ -6,7 +6,7 @@ from discord.ext import commands
 from views.stream_detail import StreamDetail
 
 BASE_URL = "https://api.chzzk.naver.com/service/v1/channels/"
-BASE_UR_V2 = "https://api.chzzk.naver.com/service/v2/channels/"
+BASE_URL_V2 = "https://api.chzzk.naver.com/service/v2/channels/"
 
 
 class BroadcastInfo(commands.Cog):
@@ -34,7 +34,7 @@ class BroadcastInfo(commands.Cog):
 
     async def fetch_stream_info(self, channel_id: str):
         try:
-            async with self.session.get(f"{BASE_UR_V2}{channel_id}/live-detail") as streamer_info:
+            async with self.session.get(f"{BASE_URL_V2}{channel_id}/live-detail") as streamer_info:
                 streamer_info.raise_for_status()
                 return await streamer_info.json()
         except aiohttp.ClientResponseError as e:
@@ -81,8 +81,12 @@ class BroadcastInfo(commands.Cog):
 
             stream_info_data = stream_info_data["content"]
             embed.timestamp = discord.utils.utcnow()
-            embed.set_image(
-                url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
+            if stream_info_data["liveImageUrl"] == None:
+                embed.set_image(
+                    url=streamer_info_data["channelImageUrl"])
+            else:
+                embed.set_image(
+                    url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
             embed.add_field(
                 name="방송 제목", value=stream_info_data["liveTitle"], inline=False)
             embed.add_field(
@@ -92,7 +96,7 @@ class BroadcastInfo(commands.Cog):
             embed.add_field(
                 name="누적 시청자 수", value=f"{stream_info_data['accumulateCount']}명", inline=False)
             embed.add_field(
-                name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}", inline=False)
+                name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' or stream_info_data['liveCategoryValue'] == None else stream_info_data['liveCategoryValue']}".replace("talk", "토크"))
 
             await interaction.response.send_message(embed=embed, view=StreamDetail(timeout=15, interaction=interaction, embed=embed))
         else:

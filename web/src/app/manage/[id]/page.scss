@@ -1,15 +1,3 @@
-.ManageAuth {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
-.ManageAuth > * {
-  gap: 16px;
-}
-
 .LoadingIcon {
   animation: rotate 1s linear infinite;
 }
@@ -64,11 +52,6 @@
   }
 }
 
-.Manage {
-  display: flex;
-  flex-direction: column;
-}
-
 .Loading {
   display: flex;
   flex-direction: column;
@@ -77,46 +60,10 @@
   height: 100vh;
 }
 
-.Content {
+.ManageGuild {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 16px;
-
-  width: 80%;
-  max-width: 1200px;
-  align-self: center;
+  justify-content: center;
   height: calc(100vh - 64px);
-}
-
-.GuildList {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 16px;
-  width: 100%;
-}
-
-.GuildItem {
-  display: flex;
-  width: 75vmin;
-  padding: 16px;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 16px;
-  cursor: pointer;
-
-  h2 {
-    padding: 0px;
-    margin: 0px;
-  }
-
-  .GuildIcon {
-    border-radius: 50%;
-    border: 3px solid #aef5dc;
-  }
 }

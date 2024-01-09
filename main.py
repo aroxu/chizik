@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import CommandNotFound
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 from db.index import DB
 from models.alert import Alert
@@ -95,8 +95,11 @@ async def guilds():
 
 
 @app.get("/guilds/{guild_id}")
-async def guild(guild_id):
+async def guild(guild_id: str, response: Response):
     guild = chizik.get_guild(int(guild_id))
+    if guild is None:
+        response.status_code = 404
+        return {"message": "Not Found"}
     alerts = Alert.select().where(Alert.guild_id == guild_id)
     result = []
     for alert in alerts:

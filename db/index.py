@@ -34,7 +34,7 @@ class DB(SingletonInstance):
     def initialize(self):
         self._db = MySQLDatabase(
             str(os.environ.get("MYSQL_DATABASE")),
-            host="db",  # str(os.environ.get("MYSQL_HOST")),
+            host=str(os.environ.get("MYSQL_HOST_CONNECT")),
             port=int(os.environ.get("MYSQL_PORT")),
             user=str(os.environ.get("MYSQL_USER")),
             password=str(os.environ.get("MYSQL_PASSWORD")),

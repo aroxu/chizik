@@ -99,10 +99,14 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                                      url=f"https://chzzk.naver.com/{alert.streamer_id}", icon_url=streamer_info["channelImageUrl"])
                     embed.set_footer(text=alert.streamer_id)
                     embed.timestamp = discord.utils.utcnow()
-                    embed.set_image(
-                        url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
+                    if stream_info_data["liveImageUrl"] == None:
+                        embed.set_image(
+                            url=streamer_info["channelImageUrl"])
+                    else:
+                        embed.set_image(
+                            url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
                     embed.add_field(
-                        name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}".replace("talk", "토크"))
+                        name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' or stream_info_data['liveCategoryValue'] == None else stream_info_data['liveCategoryValue']}".replace("talk", "토크"))
 
                     channel = asyncio.run_coroutine_threadsafe(
                         self.bot.fetch_channel(alert.alert_channel), self.bot.loop).result()
@@ -163,10 +167,14 @@ class BroadcastGuildAlert(commands.GroupCog, name="방송알림"):
                          url=f"https://chzzk.naver.com/{channel_id}", icon_url=streamer_info["channelImageUrl"])
         embed.set_footer(text=channel_id)
         embed.timestamp = discord.utils.utcnow()
-        embed.set_image(
-            url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
+        if stream_info_data["liveImageUrl"] == None:
+            embed.set_image(
+                url=streamer_info["channelImageUrl"])
+        else:
+            embed.set_image(
+                url=stream_info_data["liveImageUrl"].replace("{type}", "720"))
         embed.add_field(
-            name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' else stream_info_data['liveCategoryValue']}".replace("talk", "토크"))
+            name="카테고리", value=f"{'미정' if stream_info_data['liveCategoryValue'] == '' or stream_info_data['liveCategoryValue'] == None else stream_info_data['liveCategoryValue']}".replace("talk", "토크"))
 
         view = StreamAlertCreateConfirm(timeout=15, interaction=interaction,
                                         channel_id=channel_id, alert_channel=alert_channel, alert_text=alert_text)
