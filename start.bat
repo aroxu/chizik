@@ -2,4 +2,4 @@
 pip install -r requirements.txt
 pip install --no-binary :all: psutil
 cls
-python main.py
+uvicorn main:app --host 0.0.0.0 --port 11020 --reload
