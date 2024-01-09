@@ -17,3 +17,5 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
+// TODO: remove rewrites adn use custom api with next-auth

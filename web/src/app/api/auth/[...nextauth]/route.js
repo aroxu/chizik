@@ -1,13 +1,12 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
+
+import { pages } from "@/config/pages";
 
 const scopes = ["identify", "guilds"].join(" ");
 
-const handler = NextAuth({
-  pages: {
-    signIn: "/manage/auth/error",
-    error: "/manage/auth/error",
-  },
+const authOptions = {
+  pages,
   providers: [
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID ?? "",
@@ -15,6 +14,7 @@ const handler = NextAuth({
       authorization: { params: { scope: scopes } },
     }),
   ],
-});
+};
 
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
