@@ -16,7 +16,7 @@ $primary-700: #00c580;
 .App-container {
   text-align: center;
   display: flex;
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: 1600px) {
     flex-direction: column;
   }
   flex-direction: row;
@@ -79,7 +79,7 @@ $primary-700: #00c580;
   top: 0;
   position: sticky;
   min-height: 100vh;
-  @media screen and (max-width: 1024px) {
+  @media screen and (max-width: 1600px) {
     flex: 1;
     position: relative;
     height: 75vh;
